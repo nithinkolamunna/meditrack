@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctors-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doctors-service
+  template:
+    metadata:
+      labels:
+        app: doctors-service
+    spec:
+      containers:
+      - name: doctors-service
+        image: 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:doctors-service
+        ports:
+        - containerPort: 5001
