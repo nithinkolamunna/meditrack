@@ -25,3 +25,6 @@ EXPOSE 5000
 # CMD ["python", "doctors.py"]
 # CMD ["python", "notification.py"]
 CMD ["python", "appointment.py"]
+
+
+##
