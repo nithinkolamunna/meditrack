@@ -1,4 +1,4 @@
-name: Deploy to EKS
+name: Deploy Appointment Service to EKS
 
 on:
   push:
@@ -32,10 +32,10 @@ jobs:
         run: |
           IMAGE_TAG="appointment-service"
           ECR_REPO="183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack"
-          
+
           # Navigate to the appointment service directory
           cd appointment
-          
+
           # Build the Docker image
           docker build -t $ECR_REPO:$IMAGE_TAG .
 
@@ -48,7 +48,10 @@ jobs:
           IMAGE_TAG="appointment-service"
           ECR_REPO="183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack"
           
-          # Update the image in the Kubernetes deployment
+          # Navigate to the YAML directory
+          cd ../ymal
+
+          # Apply the deployment changes for appointment service
           kubectl set image deployment/appointment-service appointment-service=$ECR_REPO:$IMAGE_TAG --kubeconfig=${{ secrets.KUBECONFIG }}
 
           # Ensure the rollout was successful
