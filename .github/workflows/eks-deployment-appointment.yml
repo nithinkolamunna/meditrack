@@ -1,4 +1,4 @@
-name: EKS Deployment
+name: Deploy to EKS
 
 on:
   push:
@@ -7,72 +7,49 @@ on:
 
 jobs:
   deploy:
+    name: Build and Deploy Appointment Service
     runs-on: ubuntu-latest
 
-    env:
-      ECR_REPO: 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack # ECR repository
-      IMAGE_TAG: appointment-service # Docker image tag
-
     steps:
-    # Step 1: Checkout the code
-    - name: Checkout Code
-      uses: mediTrackUser
-      with:
-        repository: nithinkolamunna/meditrack
-        ref: main
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Navigate to Appointment Directory
-      run: |
-        cd appointment
-        echo "Navigated to appointment service directory"
+      # Step 2: Configure AWS credentials for mediTrackUser
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    # Step 2: Log in to Amazon ECR
-    - name: Log in to Amazon ECR
-      uses: mediTrackUser
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
-    # Step 3: Build and push the Docker image
-    - name: Build and Push Docker Image
-      run: |
-        docker build -t $ECR_REPO:$IMAGE_TAG ./appointment
-        docker push $ECR_REPO:$IMAGE_TAG
+      # Step 4: Build and push Docker image
+      - name: Build and Push Docker Image to ECR
+        run: |
+          IMAGE_TAG="appointment-service"
+          ECR_REPO="183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack"
+          
+          # Navigate to the appointment service directory
+          cd appointment
+          
+          # Build the Docker image
+          docker build -t $ECR_REPO:$IMAGE_TAG .
 
-    # Step 4: Configure kubectl
-    - name: Configure Kubectl
-      uses: mediTrackUser
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    - name: Update kubeconfig
-      run: |
-        aws eks update-kubeconfig --region us-east-1 --name meditrack
+          # Push the Docker image to ECR
+          docker push $ECR_REPO:$IMAGE_TAG
 
-    # Step 5: Deploy Green Deployment
-    - name: Deploy Green
-      run: |
-        kubectl set image deployment/green-app green-app=$ECR_REPO:$IMAGE_TAG
-        kubectl rollout status deployment/green-app
+      # Step 5: Update EKS Deployment
+      - name: Update Kubernetes Deployment
+        run: |
+          IMAGE_TAG="appointment-service"
+          ECR_REPO="183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack"
+          
+          # Update the image in the Kubernetes deployment
+          kubectl set image deployment/appointment-service appointment-service=$ECR_REPO:$IMAGE_TAG --kubeconfig=${{ secrets.KUBECONFIG }}
 
-    # Step 6: Validate Green Deployment
-    - name: Validate Green
-      run: |
-        kubectl get pods -l app=green-app -o wide
-
-    # Step 7: Switch Traffic
-    - name: Switch Traffic to Green
-      run: |
-        kubectl patch service meditrackApp-service -p '{"spec":{"selector":{"app":"green-app"}}}'
-
-    # Step 8: Remove Blue Deployment
-    - name: Remove Blue Deployment
-      run: |
-        kubectl delete deployment blue-app
-
-    # Post Job Success/Failure Messages
-    - name: Notify Success
-      if: success()
-      run: echo "Blue-Green deployment completed successfully!"
-
-    - name: Notify Failure
-      if: failure()
-      run: echo "Deployment failed. Check the logs for errors."
+          # Ensure the rollout was successful
+          kubectl rollout status deployment/appointment-service --kubeconfig=${{ secrets.KUBECONFIG }}
