@@ -16,7 +16,7 @@ jobs:
     steps:
     # Step 1: Checkout the code
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: mediTrackUser
       with:
         repository: nithinkolamunna/meditrack
         ref: main
@@ -28,7 +28,7 @@ jobs:
 
     # Step 2: Log in to Amazon ECR
     - name: Log in to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: mediTrackUser
 
     # Step 3: Build and push the Docker image
     - name: Build and Push Docker Image
@@ -38,7 +38,7 @@ jobs:
 
     # Step 4: Configure kubectl
     - name: Configure Kubectl
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: mediTrackUser
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
