@@ -41,7 +41,7 @@ jobs:
 
           # Push the Docker image to ECR
           docker push $ECR_REPO:$IMAGE_TAG
-
+ 
       # Step 5: Update EKS Deployment
       - name: Update Kubernetes Deployment
         run: |
