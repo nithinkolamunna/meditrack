@@ -1,0 +1,247 @@
+
+
+01.API define,
+    Reference:
+        https://www.youtube.com/watch?v=GMppyAPbLYk&ab_channel=TechWithTim
+
+
+02.Table, Schema define, (AWS RDS SQL)
+
+
+03. Create requirements.txt file
+
+
+04. Create Dokcer file
+		docker build --platform linux/amd64 -t patient-service ./patients
+        docker build --platform linux/amd64 -t doctors-service ./doctors
+        docker build --platform linux/amd64 -t notification-service ./notification
+        docker build --platform linux/amd64 -t appointment-service ./appointment         
+	# Need to create each image for each micro service
+
+
+05. Run and check
+        docker run -p 5001:5001 patient-service
+        docker run -p 5002:5002 doctors-service
+        docker run -p 5003:5003 notification-service
+        docker run -p 5004:5004 appointment-service
+
+
+06. TAR File Backup
+    1. Save the Docker Image as a TAR File
+    docker save -o /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/patient-service.tar patient-service
+    docker save -o /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/doctors-service.tar doctors-service
+    docker save -o /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/notification-service.tar notification-service
+    docker save -o /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/appointment-service.tar appointment-service
+
+    2. Load the Image from the TAR File
+    docker load -i /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/patient-service.tar
+    docker load -i /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/doctors-service.tar
+    docker load -i /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/notification-service.tar
+    docker load -i /Users/nithinkolamunna/Documents/Documents/MSc\ Big\ Data\ Analytics/Lectures/Semester\ 1/07.\ CMM707\ -\ Cloud\ Computing/Course\ Work/dockerimages/appointment-service.tar
+
+    3. docker image inspect <IMAGE_NAME>
+
+
+Steps to Deploy Your Applications Using EKS:
+07. Setup AWS CLI and Kubectl:
+        07.01 Install the AWS CLI and configure it using your credentials.
+                Download and install the package
+
+        07.02 Install kubectl, the command-line tool for Kubernetes.
+                To install kubectl on a Mac, you can follow these steps:
+                    Install with brew (Recommended)
+                    01. Install Homebrew (if not already installed):
+                        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+                        echo >> /Users/nithinkolamunna/.zprofile
+                        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/nithinkolamunna/.zprofile
+                        eval "$(/opt/homebrew/bin/brew shellenv)"
+
+                    02. Install kubectl:
+                        brew install kubectl
+
+                    03. Verify Installation
+                        kubectl version --client
+
+
+08. Create ECR Repositories in AWS
+
+    Create a IAM User with below permission
+        AdministratorAccess
+        AmazonEC2ContainerRegistryFullAccess
+        IAMReadOnlyAccess
+        administratorAccess
+
+    aws configure
+
+	User                : ecr-user
+	Access key 		    : AKIASVLKB6VKL5GY5TE4
+	Secret access key   : 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
+    region              : us-east-1
+    Output format       : json
+    Account ID          : 183295407444
+    
+	User                : mediTrackUser
+	Access key 		    : AKIASVLKB6VKNSP72WEO
+	Secret access key   : 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
+    region              : us-east-1
+    Output format       : json
+    Account ID          : 183295407444
+    password            : Blackhole@@
+
+    user                : ec2-user
+    password            : pass@123
+   
+    Loging to AWS env using terminal: 
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 183295407444.dkr.ecr.us-east-1.amazonaws.com
+
+    Create an ECR repository:
+        aws ecr create-repository --repository-name meditrack
+        
+        Verify:
+        aws ecr describe-repositories --repository-names meditrack
+
+    Tagging & Pushing Images
+        docker tag patient-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:patient-service
+        docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:patient-service
+
+        docker tag doctors-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:doctors-service
+        docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:doctors-service
+
+        docker tag notification-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:notification-service
+        docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:notification-service
+
+        docker tag appointment-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:appointment-service
+        docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:appointment-service
+
+        Verify:
+            aws ecr list-images --repository-name meditrack
+
+
+    Create deployment.yaml
+
+    create service.yaml
+
+
+
+09. Create a User
+
+
+    
+
+10. Create /Setup an EKS Cluster:              
+        Use the AWS Management Console, CLI.    
+        Allocate a managed node group for worker nodes
+
+    Create the EKS Cluster
+        eksctl create cluster \
+        --name mediTrack-EKS \
+        --region us-east-1 \
+        --nodegroup-name app-nodes \
+        --node-type t2.micro \
+        --nodes 2 \
+        --nodes-min 1 \
+        --nodes-max 2 \
+        --node-volume-size 20 \
+        --managed \
+        --with-oidc
+
+    Verify the Cluster
+        kubectl get nodes
+
+  X  Create a Namespace
+  X      kubectl create namespace meditrack
+  X      kubectl get namespaces
+
+
+
+
+
+
+
+
+    Deploy Your Services  to the namespace
+        kubectl apply -f patients/patient-service-deployment.yaml -n meditrack
+        kubectl apply -f doctors/doctors-service-deployment.yaml -n meditrack
+        kubectl apply -f notification/notification-service-deployment.yaml -n meditrack
+        kubectl apply -f appointment/appointment-service-deployment.yaml -n meditrack
+
+    Expose the serices.
+        kubectl apply -f patients/patient-service-service.yaml -n meditrack
+        kubectl apply -f doctors/doctors-service-service.yaml -n meditrack
+        kubectl apply -f notification/notification-service-service.yaml -n meditrack
+        kubectl apply -f appointment/appointment-service-service.yaml -n meditrack
+
+    Verify Pods and Services
+        kubectl get all -n meditrack
+        kubectl get svc -n meditrack
+        kubectl describe pod <pod-name>    
+
+    Monitor and Manage
+            kubectl get pods -n meditrack
+            kubectl get services -n meditrack
+            kubectl get deployments -n meditrack
+            kubectl logs <pod-name> -n meditrack    
+
+        # delete pods
+        kubectl delete pod appointment-service -n meditrack
+
+
+
+    Verify:
+    List down the cluster info:
+        aws eks list-clusters --region us-east-1
+        aws eks describe-cluster --name mediTrack-Cluster --region us-east-1
+
+        Verify the Cluster:
+            Update your kubectl configuration:
+                aws eks --region us-east-1 update-kubeconfig --name mediTrack-Cluster
+
+            Check Node Count in EKS Cluster:
+                aws eks describe-nodegroup --cluster-name mediTrack-Cluster --nodegroup-name app-nodes --region us-east-1
+
+
+
+
+11. Install ingress-nginx
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0-beta.0/deploy/static/provider/cloud/deploy.yaml
+
+    kubectl apply -f meditrack-ingress.yaml
+
+    Verify:
+        kubectl get pods -n ingress-nginx
+        kubectl get ingress -n meditrack
+        kubectl describe ingress meditrack-ingress -n meditrack
+        kubectl get svc -n ingress-nginx
+            * Look for the EXTERNAL-IP field under the service ingress-nginx-controller
+
+    curl http://<EXTERNAL-IP>/appointment
+    curl http://<EXTERNAL-IP>/doctors
+    curl http://<EXTERNAL-IP>/notification
+    curl http://<EXTERNAL-IP>/patient
+
+    curl http://a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com/appointment
+    curl http://a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com/doctors 
+    curl http://a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com/notification
+    curl http://a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com/patient
+                a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com
+
+
+    Monitor and Debug
+        # Check the logs of the Ingress Controller
+            kubectl logs -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
+
+        # Check events related to the Ingress
+            kubectl get events -n ingress-nginx
+            kubectl describe ingress meditrack-ingress -n meditrack
+
+        # Verify all resources in the `meditrack` namespace
+            kubectl get all -n meditrack
+
+
+
+12. GitHub Action Integration
+
+
+
+aws eks update-kubeconfig --region us-east-1 --name mediTrack-Cluster
