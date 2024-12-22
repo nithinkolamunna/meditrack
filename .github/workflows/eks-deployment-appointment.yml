@@ -42,7 +42,14 @@ jobs:
           # Push the Docker image to ECR
           docker push $ECR_REPO:$IMAGE_TAG
  
-      # Step 5: Update EKS Deployment
+      # Step 5: Configure KUBECONFIG in GitHub Workflow
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          kubectl get nodes
+
+      # Step 6: Update EKS Deployment
       - name: Update Kubernetes Deployment
         run: |
           IMAGE_TAG="appointment-service"
@@ -56,7 +63,7 @@ jobs:
           fi
 
           # Apply the deployment changes for appointment service
-          kubectl set image deployment/appointment-service appointment-service=$ECR_REPO:$IMAGE_TAG --kubeconfig=${{ secrets.KUBECONFIG }}
+          kubectl set image deployment/appointment-service appointment-service=$ECR_REPO:$IMAGE_TAG
 
           # Ensure the rollout was successful
-          kubectl rollout status deployment/appointment-service --kubeconfig=${{ secrets.KUBECONFIG }}
+          kubectl rollout status deployment/appointment-service
