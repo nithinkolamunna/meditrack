@@ -61,16 +61,16 @@ jobs:
         run: |
           IMAGE_TAG="appointment-service"
           ECR_REPO="183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack"
-
-          # Ensure the correct directory path
-          if [ -d "../yaml" ]; then
-            cd ../yaml
-          else
-            echo "YAML directory not found. Check your repository structure." && exit 1
-          fi
-
-          # Apply the deployment changes for appointment service
-          kubectl set image deployment/appointment-service appointment-service=$ECR_REPO:$IMAGE_TAG
-
+      
+          # Navigate to the yaml directory
+          cd yaml
+      
+          # Apply the deployment changes for the appointment service
+          kubectl set image -f appointment-service-deployment.yaml appointment-service=$ECR_REPO:$IMAGE_TAG
+      
           # Ensure the rollout was successful
-          kubectl rollout status deployment/appointment-service
+          kubectl rollout status -f appointment-service-deployment.yaml
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
