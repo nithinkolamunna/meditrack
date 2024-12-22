@@ -3,7 +3,7 @@
 -- Endpoint : meditrackdb-sql.c1q2cm4givcj.us-east-1.rds.amazonaws.com
 -- port     : 1433
 -- Database : meditrackDB
--- UN/PW    : admin/nkol6056
+-- UN/PW    : admin/
 -- ** Publicly accessible SET Yes
 -- ** Edit Inblund ruless,
 --		Add rules - MSSQL(Default port will pick, And set Source as well)
@@ -78,3 +78,5 @@ GO
 ALTER SCHEMA common TRANSFER dbo.appointments;
 GO
 ALTER SCHEMA common TRANSFER dbo.notifications;
+
+asd
