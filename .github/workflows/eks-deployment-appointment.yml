@@ -47,7 +47,9 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          kubectl config view
           kubectl get nodes
+
 
       # Step 6: Update EKS Deployment
       - name: Update Kubernetes Deployment
