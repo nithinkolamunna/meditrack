@@ -17,3 +17,16 @@ spec:
         image: 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:notification-service
         ports:
         - containerPort: 5002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5002
+  type: ClusterIP
