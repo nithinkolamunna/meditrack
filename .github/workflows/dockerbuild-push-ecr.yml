@@ -59,23 +59,19 @@ jobs:
       # Step 6: Configure kubectl for EKS
       - name: Configure kubectl for EKS
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name <cluster-name>
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --n default
 
       # Step 7: Deploy to EKS
       - name: Deploy to EKS
+
+      # Step 4: Apply Kubernetes manifests
+      - name: Apply Kubernetes Manifests
         run: |
-          SERVICES=("appointment" "doctors" "notification" "patients")
-          ECR_REPO="${{ secrets.ECR_REPOSITORY_URL }}"
-
-          for SERVICE in "${SERVICES[@]}"
-          do
-            echo "Deploying $SERVICE..."
-
-            IMAGE_TAG="$SERVICE-service"
-
-            # Update the image in the deployment manifest
-            kubectl set image deployment/$SERVICE-service $SERVICE-service=$ECR_REPO:$IMAGE_TAG -n default
-
-            # Ensure the rollout was successful
-            kubectl rollout status deployment/$SERVICE-service -n default
-          done
+          kubectl apply -f config-map.yaml
+          kubectl apply -f api-gateway-deployment.yaml
+          kubectl apply -f appointment-deployment.yaml
+          kubectl apply -f authentication-deployment.yaml
+          kubectl apply -f doctor-deployment.yaml
+          kubectl apply -f notification-deployment.yaml
+          kubectl apply -f patient-record-deployment.yaml
+          kubectl apply -f report-deployment.yaml
