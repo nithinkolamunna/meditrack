@@ -1,0 +1,47 @@
+name: Docker Images Build and Push to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Loging to ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 4: Build and push Docker images
+      - name: Build and push Docker images
+        run: |
+          SERVICES=("appointment-service" "doctors-service" "notification-service" "patient-service")
+          for SERVICE in "${SERVICES[@]}"
+          do
+            docker build -t $ECR_REPOSITORY_URL/$SERVICE:latest ./$SERVICE
+            docker push $ECR_REPOSITORY_URL/$SERVICE:latest
+          done
+        env:
+          ECR_REPOSITORY_URL: ${{ secrets.ECR_REPOSITORY_URL }}
+
+      # Step 5: Save the artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-success
+          path: ./
