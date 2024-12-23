@@ -22,7 +22,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Loging to ECR
+      # Step 3: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -33,15 +33,15 @@ jobs:
           SERVICES=("appointment-service" "doctors-service" "notification-service" "patient-service")
           for SERVICE in "${SERVICES[@]}"
           do
-            docker build -t $ECR_REPOSITORY_URL/$SERVICE:latest ./$SERVICE
-            docker push $ECR_REPOSITORY_URL/$SERVICE
-          done
-        env:
-          ECR_REPOSITORY_URL: ${{ secrets.ECR_REPOSITORY_URL }}
+            # Navigate to the service directory
+            cd $SERVICE
 
-      # Step 5: Save the artifact
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-success
-          path: ./
+            # Build the Docker image
+            docker build -t ${{ secrets.ECR_REPOSITORY_URL }}/$SERVICE:latest .
+
+            # Push the Docker image to ECR
+            docker push ${{ secrets.ECR_REPOSITORY_URL }}/$SERVICE:latest
+
+            # Return to the root directory
+            cd ..
+          done
