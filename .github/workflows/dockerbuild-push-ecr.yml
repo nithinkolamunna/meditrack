@@ -61,7 +61,24 @@ jobs:
       #  run: |
       #    # aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name <cluster-name>
           
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Update kubeconfig for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name mediTrack-eksClus
+
+          
       # Step 7: Apply Kubernetes manifests
       - name: Apply Kubernetes Manifests
         run: |
