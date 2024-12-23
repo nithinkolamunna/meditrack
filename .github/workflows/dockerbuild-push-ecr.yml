@@ -39,10 +39,11 @@ jobs:
             cd $SERVICE
 
             # Build the Docker image
-            docker build -t ${{ secrets.ECR_REPOSITORY_URL }}/$SERVICE:latest .
+            docker build -t 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack/$SERVICE:latest .
 
             # Push the Docker image to ECR
-            docker push ${{ secrets.ECR_REPOSITORY_URL }}/$SERVICE:latest
+            docker tag $SERVICE-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
+            docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
 
             # Return to the root directory
             cd ..
