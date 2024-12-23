@@ -51,3 +51,60 @@ jobs:
             # Return to the root directory
             cd ..
           done
+      # Step 1: Sleep for 120 seconds
+      - name: Wait for 120 seconds before starting
+        run: sleep 120
+
+      # Step 4: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Step 5: Build and push Docker images
+      - name: Build and Push Docker Images
+        run: |
+          SERVICES=("appointment" "doctors" "notification" "patients")
+          ECR_REPO="${{ secrets.ECR_REPOSITORY_URL }}"
+
+          for SERVICE in "${SERVICES[@]}"
+          do
+            echo "Building and pushing $SERVICE..."
+
+            IMAGE_TAG="$SERVICE-service"
+
+            # Navigate to the service directory
+            cd $SERVICE
+
+            # Build the Docker image
+            docker build -t $ECR_REPO:$IMAGE_TAG .
+
+            # Push the Docker image to ECR
+            docker push $ECR_REPO:$IMAGE_TAG
+
+            # Return to the root directory
+            cd ..
+          done
+
+      # Step 6: Update kubeconfig for EKS
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --n default
+
+      # Step 7: Apply Kubernetes manifests
+      - name: Deploy to EKS
+        run: |
+          SERVICES=("appointment" "doctors" "notification" "patients")
+          YAML_DIR="./yaml"
+          ECR_REPO="${{ secrets.ECR_REPOSITORY_URL }}"
+
+          for SERVICE in "${SERVICES[@]}"
+          do
+            echo "Deploying $SERVICE..."
+
+            IMAGE_TAG="$SERVICE-service"
+
+            # Update the image in the deployment manifest
+            kubectl set image deployment/$SERVICE-service $SERVICE-service=$ECR_REPO:$IMAGE_TAG -n default
+
+            # Ensure the rollout was successful
+            kubectl rollout status deployment/$SERVICE-service -n default
+          done          
