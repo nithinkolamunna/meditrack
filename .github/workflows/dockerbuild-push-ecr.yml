@@ -44,6 +44,7 @@ jobs:
             # Push the Docker image to ECR
             # docker tag $SERVICE-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
             # docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
+            docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
 
             # Return to the root directory
             cd ..
