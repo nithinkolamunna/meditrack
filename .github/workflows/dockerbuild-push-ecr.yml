@@ -30,7 +30,7 @@ jobs:
       # Step 4: Build and push Docker images
       - name: Build and push Docker images
         run: |
-          SERVICES=("appointment" "doctors" "notification" "patients")
+          SERVICES=("appointment" "doctors" "notification")
           for SERVICE in "${SERVICES[@]}"
           do
             echo "Processing $SERVICE..."
