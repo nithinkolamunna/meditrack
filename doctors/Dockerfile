@@ -20,7 +20,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 EXPOSE 5000
 
 # Define the command to run the service
-# CMD ["python", "patients.py"]
 CMD ["python", "doctors.py"]
-# CMD ["python", "notification.py"]
-# CMD ["python", "appointment.py"]
