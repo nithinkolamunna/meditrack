@@ -230,8 +230,6 @@ Steps to Deploy Your Applications Using EKS:
             aws eks describe-nodegroup --cluster-name mediTrack-eksClus --nodegroup-name app-nodes --region us-east-1
 
 
-
-
 11. Install ingress-nginx
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0-beta.0/deploy/static/provider/cloud/deploy.yaml
 
@@ -239,21 +237,17 @@ Steps to Deploy Your Applications Using EKS:
 
     Verify:
         kubectl get pods -n ingress-nginx
-        kubectl get ingress
-        kubectl describe ingress meditrack-ingress -n
+        kubectl get ingress 
+        kubectl get ingress -n default 
+        kubectl describe ingress meditrack-ingress
         kubectl get svc -n ingress-nginx
             * Look for the EXTERNAL-IP field under the service ingress-nginx-controller
 
-    curl http://<EXTERNAL-IP>/appointment
-    curl http://<EXTERNAL-IP>/doctors
-    curl http://<EXTERNAL-IP>/notification
-    curl http://<EXTERNAL-IP>/patient
 
     curl http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/appointment
     curl http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/doctors 
     curl http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/notification
     curl http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/patient
-                a172ab3847fa143ed9c5d13e3cebd63a-611023344.us-east-1.elb.amazonaws.com
 
 
     Monitor and Debug
@@ -262,10 +256,12 @@ Steps to Deploy Your Applications Using EKS:
 
         # Check events related to the Ingress
             kubectl get events -n ingress-nginx
-            kubectl describe ingress meditrack-ingress -n meditrack
+            kubectl describe ingress meditrack-ingress
 
-        # Verify all resources in the `meditrack` namespace
-            kubectl get all -n meditrack
+        # Verify all resources
+            kubectl get all
+            kubectl get ingress -n default 
+
 
 
 

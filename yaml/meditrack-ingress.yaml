@@ -2,39 +2,37 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: meditrack-ingress
-  namespace:
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  namespace: default  
 spec:
   rules:
-    - host: meditrack.app
-      http:
-        paths:
-          - path: /appointment
-            pathType: Prefix  
-            backend:
-              service:
-                name: appointment-service
-                port:
-                  number: 80
-          - path: /doctors
-            pathType: Prefix
-            backend:
-              service:
-                name: doctors-service
-                port:
-                  number: 80
-          - path: /notification
-            pathType: Prefix
-            backend:
-              service:
-                name: notification-service
-                port:
-                  number: 80
-          - path: /patient
-            pathType: Prefix
-            backend:
-              service:
-                name: patient-service
-                port:
-                  number: 80
+  - host: meditrack-app.com
+    http:
+      paths:
+      - path: /appointment
+        pathType: Prefix
+        backend: 
+          service:
+            name: appointment-service
+            port:
+              number: 80
+      - path: /doctors
+        pathType: Prefix
+        backend: 
+          service:
+            name: doctors-service
+            port:
+              number: 80
+      - path: /notification
+        pathType: Prefix
+        backend: 
+          service:
+            name: notification-service
+            port:
+              number: 80
+      - path: /patient
+        pathType: Prefix
+        backend: 
+          service:
+            name: patient-service
+            port:
+              number: 80                                          
