@@ -60,6 +60,7 @@ jobs:
       - name: Configure kubectl for EKS
         run: |
           aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name <cluster-name>
+          
 
       # Step 7: Apply Kubernetes manifests
       - name: Apply Kubernetes Manifests
