@@ -59,12 +59,9 @@ jobs:
       # Step 6: Configure kubectl for EKS
       - name: Configure kubectl for EKS
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --n default
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name <cluster-name>
 
-      # Step 7: Deploy to EKS
-      - name: Deploy to EKS
-
-      # Step 4: Apply Kubernetes manifests
+      # Step 7: Apply Kubernetes manifests
       - name: Apply Kubernetes Manifests
         run: |
           kubectl apply -f config-map.yaml
