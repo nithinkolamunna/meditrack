@@ -51,24 +51,3 @@ jobs:
             # Return to the root directory
             cd ..
           done
-
-      # Step 5: Deploy to Kubernetes using kubectl
-      - name: Deploy to Kubernetes
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          SERVICES=("appointment" "doctors" "notification" "patients")
-          ECR_REPO="${{ secrets.ECR_REPOSITORY_URL }}"
-
-          for SERVICE in "${SERVICES[@]}"
-          do
-            echo "Deploying $SERVICE..."
-
-            IMAGE_TAG="$SERVICE-service"
-
-            # Update the Kubernetes deployment with the new image
-            kubectl set image deployment/$SERVICE-service $SERVICE-service=$ECR_REPO:$IMAGE_TAG
-
-            # Ensure the rollout was successful
-            kubectl rollout status deployment/$SERVICE-service
-          done
