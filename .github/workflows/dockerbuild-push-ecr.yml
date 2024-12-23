@@ -34,7 +34,7 @@ jobs:
           for SERVICE in "${SERVICES[@]}"
           do
             docker build -t $ECR_REPOSITORY_URL/$SERVICE:latest ./$SERVICE
-            docker push $ECR_REPOSITORY_URL/$SERVICE:latest
+            docker push $ECR_REPOSITORY_URL/$SERVICE
           done
         env:
           ECR_REPOSITORY_URL: ${{ secrets.ECR_REPOSITORY_URL }}
