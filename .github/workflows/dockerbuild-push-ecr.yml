@@ -30,21 +30,19 @@ jobs:
       # Step 4: Build and push Docker images
       - name: Build and push Docker images
         run: |
-          SERVICES=("appointment" "doctors" "notification" "patients")
+          SERVICES=("appointment")
           for SERVICE in "${SERVICES[@]}"
           do
-            echo "Processing $SERVICE..."
-
-            # Navigate to the service directory
-            cd $SERVICE
-
-            # Build the Docker image
-            docker build -t 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack/$SERVICE:latest .
-
-            # Push the Docker image to ECR
-            docker tag $SERVICE-service:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
-            docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:$SERVICE-service
-
-            # Return to the root directory
-            cd ..
+            docker build -t meditrack .
+            docker tag meditrack:latest 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:latest
+            docker push 183295407444.dkr.ecr.us-east-1.amazonaws.com/meditrack:latest
           done
+        env:
+          ECR_REPOSITORY_URL: ${{ secrets.ECR_REPOSITORY_URL }}
+
+      # Step 5: Save the artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-success
+          path: ./
