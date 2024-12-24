@@ -264,8 +264,27 @@ Steps to Deploy Your Applications Using EKS:
 
 
 
-
 12. GitHub Action Integration
+	12.1 Create a workflow for build docker image and push it to the ECR
+	12.2 Add Separate part to the pull the images from ECR and deploy the manifest to the EKS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
