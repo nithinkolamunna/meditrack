@@ -1,23 +1,24 @@
+
 -- Create the appointment_metrics table
-CREATE TABLE appointment_metrics (
-    doctor_id INT NOT NULL,
-    specialization VARCHAR(100),
-    appointment_date DATE,
-    appointment_count INT
-);
+CREATE TABLE "public"."appointment_metrics"(
+    "doctor_id" INTEGER NULL,
+    "specialization" VARCHAR(100) NULL,
+    "appointment_date" DATE NULL,
+    "appointment_count" INTEGER NULL
+) ENCODE AUTO;
 
--- Create the symptom_analysis table
-CREATE TABLE symptom_analysis (
-    doctor_id INT NOT NULL,
-    symptom VARCHAR(100),
-    condition VARCHAR(100),
-    treatment_count INT
-);
 
--- Create the doctor_performance table
-CREATE TABLE doctor_performance (
-    doctor_id INT NOT NULL,
-    specialization VARCHAR(100),
-    total_appointments INT,
-    avg_consultation_time FLOAT
-);
+CREATE TABLE "public"."symptom_analysis"(
+    "doctor_id" INTEGER NULL,
+    "symptom" VARCHAR(100) NULL,
+    "condition" VARCHAR(100) NULL,
+    "treatment_count" INTEGER NULL
+) ENCODE AUTO;
+
+
+CREATE TABLE "public"."doctor_performance"(
+    "doctor_id" INTEGER NULL,
+    "specialization" VARCHAR(100) NULL,
+    "total_appointments" INTEGER NULL,
+    "avg_consultation_time" FLOAT NULL
+) ENCODE AUTO;
