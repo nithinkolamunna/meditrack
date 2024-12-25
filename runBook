@@ -6,7 +6,8 @@
 
 
 02.Table, Schema define, (AWS RDS SQL)
-
+     user: admin
+     pw  : Pass1234
 
 03. Create requirements.txt file
 
@@ -267,25 +268,24 @@ Steps to Deploy Your Applications Using EKS:
 12. GitHub Action Integration
 	12.1 Create a workflow for build docker image and push it to the ECR
 	12.2 Add Separate part to the pull the images from ECR and deploy the manifest to the EKS
+        Referance : https://www.youtube.com/watch?v=R8_veQiYBjI
+        Script    : .github/workflows/dockerbuild-push-aws.yml
 
 
+13. Create AWS Redshift database
+        Script : Database/meditrackDWH.sql
+        Refernace : https://www.youtube.com/watch?v=ja2XDOZQjs4&t=122s
+
+    user: admin
+    pw  : HWYUDcsypu075%*  
 
 
+14. Write a Lambda function for data aggregration and data transfer data to the AWS Reashift
+    01. writa a lambda funtion
 
+        mkdir layer_content && cd layer_content
+        nano requirements.txt -> pyodbc
+        cat requirements.txt    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-aws eks update-kubeconfig --region us-east-1 --name mediTrack-Cluster
+        pip install -r requirements.txt --target python/lib/python3.11/site-packages/
+        zip -r layer_content.zip python

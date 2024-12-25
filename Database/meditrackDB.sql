@@ -3,7 +3,7 @@
 -- Endpoint : meditrackdb-sql.c1q2cm4givcj.us-east-1.rds.amazonaws.com
 -- port     : 1433
 -- Database : meditrackDB
--- UN/PW    : admin/nkol6056
+-- UN/PW    : admin/pass1234
 -- ** Publicly accessible SET Yes
 -- ** Edit Inblund ruless,
 --		Add rules - MSSQL(Default port will pick, And set Source as well)
@@ -15,8 +15,16 @@ CREATE DATABASE meditrackDB;
 USE meditrackDB
 
 
+CREATE SCHEMA [patient]
+GO
+CREATE SCHEMA [doctor]
+GO
+CREATE SCHEMA [common]
+GO
+
+
 -- Table: patients
-CREATE TABLE patients (
+CREATE TABLE patient.patients (
     patient_id INT IDENTITY(1,1) PRIMARY KEY, 
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -28,7 +36,7 @@ CREATE TABLE patients (
 );
 
 -- Table: doctors
-CREATE TABLE doctors (
+CREATE TABLE doctor.doctors (
     doctor_id INT IDENTITY(1,1) PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -38,43 +46,20 @@ CREATE TABLE doctors (
 );
 
 -- Table: appointments
-CREATE TABLE appointments (
+CREATE TABLE common.appointments (
     appointment_id INT IDENTITY(1,1) PRIMARY KEY,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    appointment_date DATETIME NOT NULL,
-    status VARCHAR(50) DEFAULT 'IsScheduled',
-    notes TEXT,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
+    patient_email VARCHAR(100) NOT NULL,
+    doctor_name VARCHAR(100) NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME(7) NOT NULL,
+    status VARCHAR(50) DEFAULT 'IsScheduled'
 );
 
 -- Table: notifications
-CREATE TABLE notifications (
+CREATE TABLE common.notifications (
     notification_id INT IDENTITY(1,1) PRIMARY KEY, 
-    appointment_id INT NOT NULL,
+    patient_email VARCHAR(100) NOT NULL,
     message TEXT NOT NULL,
     sent_at DATETIME,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
+    status VARCHAR(50)
 );
-
-
-
-
--- Alter Schema
-
-CREATE SCHEMA [patient]
-GO
-CREATE SCHEMA [doctor]
-GO
-CREATE SCHEMA [common]
-GO
-
-
-ALTER SCHEMA patient TRANSFER dbo.patients;
-GO
-ALTER SCHEMA doctor TRANSFER dbo.doctors;
-GO
-ALTER SCHEMA common TRANSFER dbo.appointments;
-GO
-ALTER SCHEMA common TRANSFER dbo.notifications;
