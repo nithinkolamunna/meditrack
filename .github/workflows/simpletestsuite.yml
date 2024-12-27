@@ -1,0 +1,68 @@
+name: Simple Test Suite
+
+on:
+  workflow_run:
+    workflows:
+      - Build & Push Docker Images to ECR , EKS
+    types:
+      - completed
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+
+      # Step 3: Update kubeconfig for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name health-sync-cluster
+
+
+      # Step 4: Waiting for all pods ready
+      - name: Waiting for all pods ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app=notification-service --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=doctors-service --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=appointment-service --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=patient-service --timeout=120s 
+          
+
+      # Step 5: Run Simple Test Suite
+      - name: Run Simple Test Suite
+        env:
+          API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        run: |
+          set -e
+          echo "🔵 Run Simple Test Suite..."
+
+          # Test Patients Endpoint
+          echo "🟢 Testing Patients Endpoint..."
+          curl -X GET "http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/patient" \
+
+          # Test Appointment Endpoint
+          echo "🟢 Testing Appointment Endpoint..."
+          curl -X GET "http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/appointment" \
+
+          # Test Doctors Endpoint
+          echo "🟢 Testing Doctors Endpoint..."
+          curl -X GET "http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/doctors" \
+
+          # Test Notification Endpoint
+          echo "🟢 Testing Notification Endpoint..."
+          curl -X GET "http://af2a2fde498644e7cae93d73a44bee69-405752956.us-east-1.elb.amazonaws.com/notification" \
+          
+          echo "✅ Simple Test Suite completed successfully!"
