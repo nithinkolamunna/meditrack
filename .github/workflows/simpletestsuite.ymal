@@ -1,0 +1,66 @@
+name: Integration Tests
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy to EKS
+    types:
+      - completed
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Update kubeconfig for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name health-sync-cluster
+
+      # Step 4: Wait for all pods to be ready
+      - name: Wait for pods to be ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app=api-gateway --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=patient-record-service --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=appointment-service --timeout=120s
+
+      # Step 5: Run Integration Tests
+      - name: Run Integration Tests
+        env:
+          API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        run: |
+          set -e
+          echo "🔵 Starting integration tests..."
+
+          # Test Patients Endpoint
+          echo "🟢 Testing /api/v1/patients endpoint..."
+          curl -X GET "$API_GATEWAY_URL/api/v1/patients" \
+            -H "Authorization: Bearer $AUTH_TOKEN" \
+            -H "Content-Type: application/json"
+
+          # Test Appointments Endpoint
+          echo "🟢 Testing /api/v1/appointments endpoint..."
+          curl -X GET "$API_GATEWAY_URL/api/v1/appointments" \
+            -H "Authorization: Bearer $AUTH_TOKEN" \
+            -H "Content-Type: application/json"
+
+          # Test Doctors Endpoint
+          echo "🟢 Testing /api/v1/doctors endpoint..."
+          curl -X GET "$API_GATEWAY_URL/api/v1/doctors" \
+            -H "Authorization: Bearer $AUTH_TOKEN" \
+            -H "Content-Type: application/json"
+          
+          echo "✅ Integration tests completed successfully!"
