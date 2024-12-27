@@ -28,7 +28,7 @@ jobs:
       # Step 3: Update kubeconfig for EKS
       - name: Update kubeconfig
         run: |
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name health-sync-cluster
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name mediTrack-eksClus
 
 
       # Step 4: Waiting for all pods ready
@@ -42,9 +42,6 @@ jobs:
 
       # Step 5: Run Simple Test Suite
       - name: Run Simple Test Suite
-        env:
-          API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
-          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
           set -e
           echo "🔵 Run Simple Test Suite..."
