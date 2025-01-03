@@ -54,7 +54,7 @@ jobs:
           done
 
 # -----------------------------------------------------------
-
+#
       # Deploy to EKS
       
       # Step 5: wait for 120 seconds
